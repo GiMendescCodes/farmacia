@@ -2,37 +2,29 @@ import axios from "axios";
 import type { Categoria } from "../models/Categoria";
 
 const api = axios.create({
-    baseURL: "https://farmacia-jjxo.onrender.com/"
+    baseURL: import.meta.env.VITE_API_URL
 });
 
-class CategoriaService {
-
-
-    listar() {
-        return api.get<Categoria[]>("/categorias");
-    }
-
-
-    buscarPorId(id: number) {
-        return api.get<Categoria>(`/categorias/${id}`);
-    }
-
-
-    cadastrar(categoria: Categoria) {
-        return api.post("/categorias", categoria);
-    }
-
-
-    atualizar(categoria: Categoria) {
-    return api.put("/categorias", categoria);
+export const listar = async (url: string, setDados: Function) => {
+    const resposta = await api.get<Categoria[]>(url);
+    setDados(resposta.data);
 }
 
-
-    deletar(id: number) {
-        return api.delete(`/categorias/${id}`);
-    }
-
+export const buscarPorId = async (url: string, setDados: Function) => {
+    const resposta = await api.get<Categoria>(url);
+    setDados(resposta.data);
 }
 
+export const cadastrar = async (url: string, dados: Categoria, setDados: Function) => {
+    const resposta = await api.post(url, dados);
+    setDados(resposta.data);
+}
 
-export default new CategoriaService();
+export const atualizar = async (url: string, dados: Categoria, setDados: Function) => {
+    const resposta = await api.put(url, dados);
+    setDados(resposta.data);
+}
+
+export const deletar = async (url: string) => {
+    await api.delete(url);
+}

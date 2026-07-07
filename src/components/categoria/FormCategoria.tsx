@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import CategoriaService from "../../services/CategoriaService";
+import type { Categoria } from "../../models/Categoria";
+import { buscarPorId, cadastrar, atualizar } from "../../services/CategoriaService";
 
 
 function FormCategoria() {
@@ -9,18 +10,17 @@ function FormCategoria() {
 
     const { id } = useParams<{ id: string }>();
 
-    const [nome, setNome] = useState("");
-
+    const [categoria, setCategoria] = useState<Categoria>({
+        id: 0,
+        nome: ""
+    });
 
 
     useEffect(() => {
 
         if (id !== undefined) {
 
-            CategoriaService.buscarPorId(Number(id))
-                .then(response => {
-                    setNome(response.data.nome);
-                });
+            buscarPorId(`/categorias/${Number(id)}`, setCategoria);
 
         }
 
@@ -35,13 +35,7 @@ function FormCategoria() {
 
         if (id !== undefined) {
 
-            CategoriaService.atualizar({
-
-                id: Number(id),
-                nome: nome
-
-            })
-            .then(() => {
+            atualizar("/categorias", categoria, () => {
 
                 alert("Categoria atualizada com sucesso!");
                 navigate("/categorias");
@@ -51,14 +45,7 @@ function FormCategoria() {
 
         } else {
 
-
-            CategoriaService.cadastrar({
-
-                id: 0,
-                nome: nome
-
-            })
-            .then(() => {
+            cadastrar("/categorias", categoria, () => {
 
                 alert("Categoria cadastrada com sucesso!");
                 navigate("/categorias");
@@ -68,7 +55,6 @@ function FormCategoria() {
         }
 
     }
-
 
 
     return (
@@ -95,10 +81,20 @@ function FormCategoria() {
                         Título categoria
                     </label>
 
+
                     <input
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
+
+                        value={categoria.nome}
+
+                        onChange={(e) =>
+                            setCategoria({
+                                ...categoria,
+                                nome: e.target.value
+                            })
+                        }
+
                         placeholder="Descreva sua categoria"
+
                         className="
                         w-full
                         h-10
@@ -111,13 +107,16 @@ function FormCategoria() {
                         outline-none
                         font-['Karla']
                         "
+
                     />
 
                 </div>
 
 
                 <button
+
                     type="submit"
+
                     className="
                     bg-[#9FBAF1]
                     text-[#3D568F]
@@ -130,6 +129,7 @@ function FormCategoria() {
                     hover:bg-[#8AA9E8]
                     transition
                     "
+
                 >
 
                     {id === undefined ? "CADASTRAR" : "ATUALIZAR"}
